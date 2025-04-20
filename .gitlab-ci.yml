@@ -1,0 +1,96 @@
+stages:
+  - build
+  - test
+  - release
+
+
+
+.build:
+  stage: build
+  tags: [docker]
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  script:
+    - >-
+      /kaniko/executor
+      --cache=false
+      --skip-unused-stages
+      --context "$CI_PROJECT_DIR"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible${ANSIBLE_VERSION}"
+      --label org.opencontainers.image.authors="$LABEL_AUTHORS"
+      --label org.opencontainers.image.created="$(date -u -Iseconds)"
+      --label org.opencontainers.image.revision="$CI_COMMIT_SHA"
+      --label org.opencontainers.image.source="$CI_PROJECT_URL"
+      --build-arg ALPINE_VERSION="$ALPINE_VERSION"
+      --build-arg ANSIBLE_VERSION="$ANSIBLE_VERSION"
+
+build:latest:
+  extends: .build
+  variables:
+    ALPINE_VERSION: 3
+    ANSIBLE_VERSION: 2.18
+
+build:python2.7:
+  extends: .build
+  variables:
+    ALPINE_VERSION: 3.19
+    ANSIBLE_VERSION: 2.16
+
+
+
+.test:
+  stage: test
+  tags: [docker]
+  image:
+    name: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible${ANSIBLE_VERSION}"
+    pull_policy: always
+  script:
+    - ansible --version
+    - ansible --version | grep -q "ansible \[core $ANSIBLE_VERSION"
+
+test:latest:
+  extends: .test
+  needs: ['build:latest']
+  variables:
+    ANSIBLE_VERSION: 2.18
+
+test:python2.7:
+  extends: .test
+  needs: ['build:python2.7']
+  variables:
+    ANSIBLE_VERSION: 2.16
+
+
+
+.release:
+  stage: release
+  tags: [docker]
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: ['']
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  before_script:
+    - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+release:latest:
+  extends: .release
+  needs: ['test:latest']
+  script:
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.18 2.18
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.18 latest
+
+release:python2.7:
+  extends: .release
+  needs: ['test:python2.7']
+  script: 
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 2.16
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 python3.6
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 python2.7
+
+# vi: set ts=2 sw=2 et ft=yaml:
