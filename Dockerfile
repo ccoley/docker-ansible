@@ -9,16 +9,7 @@ RUN apk add --update --no-cache \
     ansible ansible-core~=${ANSIBLE_VERSION}
 
 # Add entrypoint script
-COPY <<EOF /entrypoint.sh
-#!/bin/sh
-set -e
-
-cp -R /tmp/.ssh /root/.ssh
-chown -R root:root /root/.ssh
-
-exec "\$@"
-EOF
-
+COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
