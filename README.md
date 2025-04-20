@@ -11,10 +11,16 @@ Images are tagged with the version of `ansible-core` included in the image. Ther
 
 ## Usage
 
-The working directory is `/ansible`, so mount your ansible playbooks and inventory files into that direcotry.
+The working directory is `/ansible`, so mount your ansible playbooks and inventory files into that directory.
 
 ```bash
-docker run --rm -it -v $(pwd):/ansible ccoley/ansible:latest ansible -m ping
+docker run --rm -it -v $(pwd):/ansible ccoley/ansible:latest ansible -m ping all
+```
+
+If you want to use your local SSH keys, known_hosts, and config in the container then mount them to `/tmp/.ssh` in the container.
+
+```bash
+docker run --rm -it -v $(pwd):/ansible -v ~/.ssh:/tmp/.ssh:ro ccoley/ansible:latest ansible -m ping all
 ```
 
 ## Building Images Locally
