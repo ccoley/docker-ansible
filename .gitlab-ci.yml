@@ -21,7 +21,7 @@ stages:
       --skip-unused-stages
       --context "$CI_PROJECT_DIR"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible${ANSIBLE_VERSION}"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${ANSIBLE_VERSION}"
       --label org.opencontainers.image.authors="$LABEL_AUTHORS"
       --label org.opencontainers.image.created="$(date -u -Iseconds)"
       --label org.opencontainers.image.revision="$CI_COMMIT_SHA"
@@ -47,7 +47,7 @@ build:python2.7:
   stage: test
   tags: [docker]
   image:
-    name: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible${ANSIBLE_VERSION}"
+    name: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${ANSIBLE_VERSION}"
     pull_policy: always
   script:
     - ansible --version
@@ -82,15 +82,15 @@ release:latest:
   extends: .release
   needs: ['test:latest']
   script:
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.18 2.18
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.18 latest
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 2.18
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 latest
 
 release:python2.7:
   extends: .release
   needs: ['test:python2.7']
   script: 
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 2.16
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 python3.6
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-ansible2.16 python2.7
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 2.16
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python3.6
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python2.7
 
 # vi: set ts=2 sw=2 et ft=yaml:
