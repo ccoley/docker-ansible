@@ -3,6 +3,9 @@ stages:
   - test
   - release
 
+variables:
+  DOCKER_HUB_REPO: ccoley/ansible
+
 
 
 .build:
@@ -76,7 +79,8 @@ test:python2.7:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   before_script:
-    - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - crane auth login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - crane auth login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_TOKEN" index.docker.io
 
 release:latest:
   extends: .release
@@ -84,6 +88,8 @@ release:latest:
   script:
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 2.18
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 latest
+    - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 ${DOCKER_HUB_REPO}:2.18
+    - crane tag ${DOCKER_HUB_REPO}:2.18 latest
 
 release:python2.7:
   extends: .release
@@ -92,5 +98,8 @@ release:python2.7:
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 2.16
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python3.6
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python2.7
+    - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 ${DOCKER_HUB_REPO}:2.16
+    - crane tag ${DOCKER_HUB_REPO}:2.16 python3.6
+    - crane tag ${DOCKER_HUB_REPO}:2.16 python2.7
 
 # vi: set ts=2 sw=2 et ft=yaml:
