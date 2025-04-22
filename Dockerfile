@@ -4,7 +4,7 @@ FROM alpine:${ALPINE_VERSION}
 ARG ANSIBLE_VERSION=2
 RUN apk add --update --no-cache \
     # Install latest version of these dependencies \
-    bash openssh python3 sshpass rsync \
+    bash openssh python3 rsync sshpass vim \
     # Install specific version of ansible-core and latest compatible ansible \
     ansible ansible-core~=${ANSIBLE_VERSION}
 
