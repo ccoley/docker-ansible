@@ -8,14 +8,20 @@ RUN apk add --update --no-cache \
     # Install specific version of ansible-core and latest compatible ansible \
     ansible ansible-core~=${ANSIBLE_VERSION}
 
-# Add entrypoint script
+# Add an entrypoint script that copies files from the /tmp/home directory into
+# the actual home directory
+RUN mkdir -p /tmp/home
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Make sure the temporary SSH directory exists since we reference it in the
-# entrypoint script
-RUN mkdir /tmp/.ssh
+# Set VIM as the default editor. Used by 'ansible-vault edit'
+ENV EDITOR=/usr/bin/vim
+
+# Add some useful aliases for instances where we want to log into the container
+# and debug stuff
+ENV ENV=/etc/profile
+RUN echo "alias ll='ls -alFh'" >> /etc/profile.d/aliases.sh
 
 WORKDIR /ansible
 

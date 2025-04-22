@@ -17,10 +17,10 @@ The working directory is `/ansible`, so mount your ansible playbooks and invento
 docker run --rm -it -v $(pwd):/ansible ccoley/ansible:latest ansible -m ping all
 ```
 
-If you want to use your local SSH keys, known_hosts, and config in the container then mount them to `/tmp/.ssh` in the container.
+If you want to use any files/directories in your home directory from within the container, then you can mount them to `/tmp/home` in the container and they'll be copied to the container user's home directory. This is useful for SSH keys and known_hosts, auth configurations, etc.
 
 ```bash
-docker run --rm -it -v $(pwd):/ansible -v ~/.ssh:/tmp/.ssh:ro ccoley/ansible:latest ansible -m ping all
+docker run --rm -it -v $(pwd):/ansible -v ~/.ssh:/tmp/home/.ssh:ro ccoley/ansible:latest ansible -m ping all
 ```
 
 ## Building Images Locally

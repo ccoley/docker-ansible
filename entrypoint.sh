@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-cp -R /tmp/.ssh /root/.ssh
-chown -R root:root /root/.ssh
+# Copy and chown files to the root user's home directory
+rsync -rlp /tmp/home/ /root/
 
 exec "$@"
 
