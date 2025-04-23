@@ -22,6 +22,7 @@ variables:
       /kaniko/executor
       --cache=false
       --skip-unused-stages
+      --target "$BUILD_TARGET"
       --context "$CI_PROJECT_DIR"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${ANSIBLE_VERSION}"
@@ -35,14 +36,30 @@ variables:
 build:latest:
   extends: .build
   variables:
-    ALPINE_VERSION: 3
+    ALPINE_VERSION: 3.21
     ANSIBLE_VERSION: 2.18
+    BUILD_TARGET: default
 
 build:python2.7:
   extends: .build
   variables:
     ALPINE_VERSION: 3.19
     ANSIBLE_VERSION: 2.16
+    BUILD_TARGET: default
+
+build:2.10:
+  extends: .build
+  variables:
+    ALPINE_VERSION: 3.14
+    ANSIBLE_VERSION: 2.10
+    BUILD_TARGET: ansible-classic
+
+build:2.9:
+  extends: .build
+  variables:
+    ALPINE_VERSION: 3.12
+    ANSIBLE_VERSION: 2.9
+    BUILD_TARGET: ansible-classic
 
 
 
@@ -54,7 +71,7 @@ build:python2.7:
     pull_policy: always
   script:
     - ansible --version
-    - ansible --version | grep -q "ansible \[core $ANSIBLE_VERSION"
+    - ansible --version | grep -Eq "ansible( \[core)? $ANSIBLE_VERSION"
 
 test:latest:
   extends: .test
@@ -67,6 +84,18 @@ test:python2.7:
   needs: ['build:python2.7']
   variables:
     ANSIBLE_VERSION: 2.16
+
+test:2.10:
+  extends: .test
+  needs: ['build:2.10']
+  variables:
+    ANSIBLE_VERSION: 2.10
+
+test:2.9:
+  extends: .test
+  needs: ['build:2.9']
+  variables:
+    ANSIBLE_VERSION: 2.9
 
 
 
@@ -101,5 +130,19 @@ release:python2.7:
     - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 ${DOCKER_HUB_REPO}:2.16
     - crane tag ${DOCKER_HUB_REPO}:2.16 python3.6
     - crane tag ${DOCKER_HUB_REPO}:2.16 python2.7
+
+release:2.10:
+  extends: .release
+  needs: ['test:2.10']
+  script:
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.10 2.10
+    - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.10 ${DOCKER_HUB_REPO}:2.10
+
+release:2.9:
+  extends: .release
+  needs: ['test:2.9']
+  script:
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.9 2.9
+    - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.9 ${DOCKER_HUB_REPO}:2.9
 
 # vi: set ts=2 sw=2 et ft=yaml:

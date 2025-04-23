@@ -8,6 +8,7 @@ Images are tagged with the version of `ansible-core` included in the image. Ther
 
 - `2.18`, `latest`
 - `2.16`, `python2.7`, `python3.6` EOL, but kept around for use with managed nodes that only support Python 2.7
+- `2.10`, `2.9` EOL, but kept around for playbooks that still only work with classic Ansible
 
 ## Usage
 
