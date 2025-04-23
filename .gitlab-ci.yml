@@ -21,6 +21,9 @@ variables:
     - >-
       /kaniko/executor
       --cache=true
+      --cache-copy-layers=true
+      --cache-run-layers=true
+      --cache-ttl $BUILD_CACHE_TTL
       --skip-unused-stages
       --target "$BUILD_TARGET"
       --context "$CI_PROJECT_DIR"
@@ -32,6 +35,8 @@ variables:
       --label org.opencontainers.image.source="$CI_PROJECT_URL"
       --build-arg ALPINE_VERSION="$ALPINE_VERSION"
       --build-arg ANSIBLE_VERSION="$ANSIBLE_VERSION"
+  variables:
+    BUILD_CACHE_TTL: 336h # 2 weeks. Override in pipeline variables to clear cache
 
 build:latest:
   extends: .build
