@@ -51,7 +51,7 @@ build:2.10:
   extends: .build
   variables:
     ALPINE_VERSION: 3.14
-    ANSIBLE_VERSION: 2.10
+    ANSIBLE_VERSION: '2.10'
     BUILD_TARGET: ansible-classic
 
 build:2.9:
@@ -89,7 +89,7 @@ test:2.10:
   extends: .test
   needs: ['build:2.10']
   variables:
-    ANSIBLE_VERSION: 2.10
+    ANSIBLE_VERSION: '2.10'
 
 test:2.9:
   extends: .test
