@@ -30,7 +30,6 @@ variables:
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${ANSIBLE_VERSION}"
       --label org.opencontainers.image.authors="$LABEL_AUTHORS"
-      --label org.opencontainers.image.created="$(date -u -Iseconds)"
       --label org.opencontainers.image.revision="$CI_COMMIT_SHA"
       --label org.opencontainers.image.source="$CI_PROJECT_URL"
       --build-arg ALPINE_VERSION="$ALPINE_VERSION"
