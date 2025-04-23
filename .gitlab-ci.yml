@@ -20,7 +20,7 @@ variables:
   script:
     - >-
       /kaniko/executor
-      --cache=false
+      --cache=true
       --skip-unused-stages
       --target "$BUILD_TARGET"
       --context "$CI_PROJECT_DIR"
