@@ -49,9 +49,8 @@ build:python2.7:
 
 build:2.10:
   extends: .build
-  rules:
-    - when: manual
-      allow_failure: false
+  when: manual
+  allow_failure: false
   variables:
     ALPINE_VERSION: 3.14
     ANSIBLE_VERSION: '2.10'
@@ -59,9 +58,8 @@ build:2.10:
 
 build:2.9:
   extends: .build
-  rules:
-    - when: manual
-      allow_failure: false
+  when: manual
+  allow_failure: false
   variables:
     ALPINE_VERSION: 3.12
     ANSIBLE_VERSION: 2.9
