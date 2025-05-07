@@ -116,8 +116,10 @@ release:latest:
   needs: ['test:latest']
   script:
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 2.18
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 python3.8
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 latest
     - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 ${DOCKER_HUB_REPO}:2.18
+    - crane tag ${DOCKER_HUB_REPO}:2.18 python3.8
     - crane tag ${DOCKER_HUB_REPO}:2.18 latest
 
 release:python2.7:
@@ -125,11 +127,11 @@ release:python2.7:
   needs: ['test:python2.7']
   script:
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 2.16
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python3.6
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python2.7
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 python3.6
     - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.16 ${DOCKER_HUB_REPO}:2.16
-    - crane tag ${DOCKER_HUB_REPO}:2.16 python3.6
     - crane tag ${DOCKER_HUB_REPO}:2.16 python2.7
+    - crane tag ${DOCKER_HUB_REPO}:2.16 python3.6
 
 release:2.10:
   extends: .release
