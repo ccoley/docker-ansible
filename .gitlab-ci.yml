@@ -37,7 +37,7 @@ build:latest:
   extends: .build
   variables:
     ALPINE_VERSION: 3.23
-    ANSIBLE_VERSION: 2.20
+    ANSIBLE_VERSION: '2.20'
     BUILD_TARGET: default
 
 build:python3.8:
@@ -86,7 +86,7 @@ test:latest:
   extends: .test
   needs: ['build:latest']
   variables:
-    ANSIBLE_VERSION: 2.20
+    ANSIBLE_VERSION: '2.20'
 
 test:python3.8:
   extends: .test
