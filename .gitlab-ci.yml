@@ -36,7 +36,14 @@ variables:
 build:latest:
   extends: .build
   variables:
-    ALPINE_VERSION: 3.21
+    ALPINE_VERSION: 3.23
+    ANSIBLE_VERSION: 2.20
+    BUILD_TARGET: default
+
+build:python3.8:
+  extends: .build
+  variables:
+    ALPINE_VERSION: 3.22
     ANSIBLE_VERSION: 2.18
     BUILD_TARGET: default
 
@@ -79,6 +86,12 @@ test:latest:
   extends: .test
   needs: ['build:latest']
   variables:
+    ANSIBLE_VERSION: 2.20
+
+test:python3.8:
+  extends: .test
+  needs: ['build:python3.8']
+  variables:
     ANSIBLE_VERSION: 2.18
 
 test:python2.7:
@@ -117,12 +130,21 @@ release:latest:
   extends: .release
   needs: ['test:latest']
   script:
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.20 2.20
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.20 python3.9
+    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.20 latest
+    - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.20 ${DOCKER_HUB_REPO}:2.20
+    - crane tag ${DOCKER_HUB_REPO}:2.20 python3.9
+    - crane tag ${DOCKER_HUB_REPO}:2.20 latest
+
+release:python3.8:
+  extends: .release
+  needs: ['test:python3.8']
+  script:
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 2.18
     - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 python3.8
-    - crane tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 latest
     - crane copy ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-2.18 ${DOCKER_HUB_REPO}:2.18
     - crane tag ${DOCKER_HUB_REPO}:2.18 python3.8
-    - crane tag ${DOCKER_HUB_REPO}:2.18 latest
 
 release:python2.7:
   extends: .release
